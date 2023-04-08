@@ -67,24 +67,82 @@ import shap
 import requests
 
 
-base=pd.read_csv("base_sample.csv")
+base=pd.read_csv("~/mygit/p7---OCR-/base_sample.csv")
 base = base.drop( columns = ['Unnamed: 0'])
 
 
 # Adding an appropriate title for the test website
-st.title("Tableau de bord client - Prêt à Dépenser")# Creating a side bar radio option for selecting the required elements
+st.title("Tableau de bord client - Prêt à Dépenser")
 
+st.write (" Affichage de l'importance des critères en moyenne  ....")
+
+# one_hot_encoder classique pour les non numériques
+def one_hot_encoder(base, nan_as_category = True):
+    original_columns = list(base.columns)
+    categorical_columns = [col for col in base.columns if base[col].dtype == 'object']
+    base2 = pd.get_dummies(base, columns= categorical_columns, dummy_na= True)
+    new_columns = [c for c in base.columns if c not in original_columns]
+    return base2
+base2 =one_hot_encoder(base)
+base = base2
+del base2
+
+# Remplacer les valeurs manquantes par la moyenne de la colonne
+base = base.fillna(base.mean())
+
+# Séparer les variables explicatives (X) et la variable cible (y)
+X = base.drop("TARGET", axis=1)
+y = base["TARGET"]
+
+# scaler 
+col_names=X.select_dtypes(include='number').columns.tolist()
+features = X[col_names]
+scaler = StandardScaler().fit(features.values)
+features_scale = scaler.transform(features.values)
+X[col_names] = features_scale
+print (X.shape) 
+del features
+del features_scale
+
+#resample and fit the model ( a remplacer par un pickle) 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+X_resampled, y_resampled = RandomUnderSampler(random_state=22).fit_resample(X_train,y_train)
+
+model = RandomForestClassifier(max_depth=5, n_estimators=100,random_state=22).fit(X_resampled,y_resampled)
+
+from shap import TreeExplainer, Explanation
+from shap.plots import waterfall
+from streamlit_shap import st_shap
+
+explainer = shap.TreeExplainer(model)
+shap_values = explainer.shap_values(X_train)
+
+st_shap( shap.summary_plot(shap_values, features=X, feature_names=X.columns, max_display=10))
+
+sv = explainer(X_train.iloc[:,:])
+exp = Explanation(sv.values[:,:,1], 
+                  sv.base_values[:,1], 
+                  data=X_train.values, 
+                  feature_names=X_train.columns)
+# afficher le beeswarm plot
+st_shap (shap.plots.beeswarm(exp))
+
+#demande du no client et stockage dans number
+noclient = st.number_input('Numero du client')
+st.write('Le client a analysé est :', noclient)
+
+
+"""
+
+# Creating a side bar radio option for selecting the required elements
 #
-
-
-
 _radio = st.sidebar.radio("menu",  ("Choix 1", "Choix 2"))
 
 #demande du no client et stockage dans number
 #numero_client = st.text_input("Saisissez un no client, merci", value="0")
 
-"""response_f= None 
-num_client = None
+#response_f= None 
+#num_client = None
 
 if st.button("Commencer"):
     # Saisie du numéro de client
@@ -112,6 +170,12 @@ if st.button("Commencer") and client:
 
 st.write("num client : {client }")
 idx = client""" 
+
+"""
+import streamlit as st
+
+number = st.number_input('Insert a number')
+st.write('The current number is ', number)
 
 
 
@@ -359,6 +423,8 @@ st.pyplot(fig)
 #st_shap (shap.force_plot(explainer.expected_value[0], shap_values[0]))
 #shap.force_plot(explainer.expected_value, shap_values[0], X.iloc[0,:])
 #st_shap(shap.force_plot(explainer.expected_value, shap_values[0,:], X.iloc[0,:]))
+
+"""
 
 
 
