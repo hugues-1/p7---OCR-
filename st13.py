@@ -9,6 +9,12 @@
 # Importer les bibliothèques nécessaires
 
 
+# todo mettre tout dans une boucle ou une fonction
+# tester en local pour la route ? 
+# affichage des données générales des features importances globales 
+#afficher les comparaisons proba versus deux variables ( plot type bundesliga ?) voir l'exemple ou l'énoncé 
+# quand numéro client est obtenu feature importance affiché) 
+
 import sys
 sys.path.append('home/ec2-user/miniconda3/lib/python3.10/site-packages/')
 sys.path.append('home/ec2-user/miniconda3/lib/python3.10/site-packages')
@@ -56,20 +62,94 @@ from sklearn.pipeline import Pipeline
 from shap import TreeExplainer
 
 import streamlit as st
-# In[ ]:
-
-
 
 import shap
-
+import requests
 
 
 base=pd.read_csv("base_sample.csv")
 base = base.drop( columns = ['Unnamed: 0'])
 
+
 # Adding an appropriate title for the test website
 st.title("Tableau de bord client - Prêt à Dépenser")# Creating a side bar radio option for selecting the required elements
+
+#
+
+
+
 _radio = st.sidebar.radio("menu",  ("Choix 1", "Choix 2"))
+
+#demande du no client et stockage dans number
+#numero_client = st.text_input("Saisissez un no client, merci", value="0")
+
+"""response_f= None 
+num_client = None
+
+if st.button("Commencer"):
+    # Saisie du numéro de client
+    numero_client = st.text_input("Saisissez un numéro de client, merci")
+    
+ # Envoi du numéro de client à l'API FastAPI
+    if numero_client:
+        response = requests.post("http://13.36.39.252:8080/client", json={"client": int(numero_client)})
+        st.write(response.json())
+        response_f=response.json()
+        # Création du DataFrame à partir de la réponse de l'API
+        df = pd.DataFrame.from_dict(response_f)
+
+        # Affichage du DataFrame dans Streamlit
+        st.write(df)"""
+
+""" # Saisie du numéro de client
+client = st.text_input("Saisissez un numéro de client, merci")
+
+# Envoi du numéro de client à l'API FastAPI
+if st.button("Commencer") and client:
+    response = requests.post("http://13.36.39.252:8080/client", json={"client": int(numero_client)})
+    data_client = response.json()
+    client = data_client["client"]
+
+st.write("num client : {client }")
+idx = client""" 
+
+
+
+# Affichage du titre
+st.title("Affichage des données clients")
+num_client = None 
+# Bouton "Commencer"
+if st.button("Commencer"):
+    # Saisie du numéro de client
+    numero_client = st.text_input("Saisissez un numéro de client, merci")
+
+    # Envoi du numéro de client à l'API FastAPI
+    if numero_client:
+        response = requests.post("http://13.36.39.252:8080/client", json={"client": int(numero_client)})
+        if response.status_code == 200:
+            st.write("Réponse de l'API : ")
+            st.write(response.json())
+            num_client = response.json()['numero_client']
+        else:
+            st.write("Une erreur est survenue. Veuillez réessayer.")
+    
+# Affichage du numéro de client récupéré
+if 'num_client' in locals():
+    st.write("Numéro de client : ", num_client)
+
+idx = num_client
+#connexion a fastapi 
+#response = requests.post("http://13.36.39.252:8080/client", json={"client": numero_client})
+#response = requests.post("http://<IP de votre EC2>:<port>/nombre?client=monclient", json={"client": number})
+
+#response = requests.post("http://<adresse_IP_EC2>:<port>/nombre", json={"numero_client": numero_client, "nombre": nombre})
+
+# Affichage de la réponse de l'API
+#st.write(response.json())
+#print(response.json()) # ou st.write(response.json()) si vous êtes dans un script Streamlit
+#st.write("Réponse de FastAPI :", response.text)
+#print(response.json())
+
 
 
 if _radio == "Choix 1":
@@ -85,25 +165,9 @@ if _radio == "Choix 1":
     if button1:
         st.markdown("*You clicked the button and the markdown is displayed*")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # In[ ]:
 
+ 
 
 # one_hot_encoder classique pour les non numériques
 def one_hot_encoder(base, nan_as_category = True):
@@ -119,14 +183,8 @@ base = base2
 del base2
 
 
-# In[ ]:
-
-
 # Remplacer les valeurs manquantes par la moyenne de la colonne
 base = base.fillna(base.mean())
-
-
-# In[ ]:
 
 
 # Séparer les variables explicatives (X) et la variable cible (y)
@@ -135,8 +193,6 @@ y = base["TARGET"]
 
 
 
-
-# In[ ]:
 
 
 # scaler 
@@ -150,17 +206,6 @@ del features
 del features_scale
 
 
-# In[ ]:
-
-
-
-
-
-# # fonction shap
-# 
-
-# In[ ]:
-
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 X_resampled, y_resampled = RandomUnderSampler(random_state=22).fit_resample(X_train,y_train)
@@ -173,14 +218,9 @@ model.fit(X_resampled,y_resampled)
 
 
 
-# In[ ]:
-
 
 # print the JS visualization code to the notebook
-shap.initjs()
-
-
-# In[ ]:
+#shap.initjs()
 
 
 from shap import TreeExplainer, Explanation
@@ -210,7 +250,7 @@ import streamlit as st
 
 data = {'feature': [], 'row_id': [], 'probability': [], 'shap_value': [], 'feature_value': []}
 
-idx = 4
+
 
 
 explainer = TreeExplainer(model)
@@ -245,8 +285,8 @@ waterfall_data_neg['Contribution'] = waterfall_data_neg['Contribution'] / 100 * 
 
 waterfall_data = pd.concat([waterfall_data_neg, waterfall_data], ignore_index=True)
 
-""" fig = go.Figure(go.waterfall(waterfall_data, x='Feature', y='Contribution', color=waterfall_data['Contribution']>0, orientation='v',
-                   text='Contribution', hover_data={'Contribution': ':.2f'}))""" 
+
+#fig = go.Figure(go.waterfall(waterfall_data, x='Feature', y='Contribution', color=waterfall_data['Contribution']>0, # orientation='v',text='Contribution', hover_data={'Contribution': ':.2f'}))
 fig = go.Figure(go.Waterfall(
     name = "Feature Contributions",
     orientation = "h",
@@ -321,7 +361,7 @@ st.pyplot(fig)
 #st_shap(shap.force_plot(explainer.expected_value, shap_values[0,:], X.iloc[0,:]))
 
 
-# In[ ]:
+
 
 
 
