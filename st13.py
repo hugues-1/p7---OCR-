@@ -1,16 +1,8 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# ## ToDo : 
-
-# In[ ]:
 
 
 # Importer les bibliothèques nécessaires
 
 
-# todo mettre tout dans une boucle ou une fonction
-# tester en local pour la route ? 
 # affichage des données générales des features importances globales 
 #afficher les comparaisons proba versus deux variables ( plot type bundesliga ?) voir l'exemple ou l'énoncé 
 # quand numéro client est obtenu feature importance affiché) 
@@ -93,6 +85,7 @@ base = base.fillna(base.mean())
 # Séparer les variables explicatives (X) et la variable cible (y)
 X = base.drop("TARGET", axis=1)
 y = base["TARGET"]
+del base
 
 # scaler 
 col_names=X.select_dtypes(include='number').columns.tolist()
@@ -109,41 +102,134 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 X_resampled, y_resampled = RandomUnderSampler(random_state=22).fit_resample(X_train,y_train)
 
 model = RandomForestClassifier(max_depth=5, n_estimators=100,random_state=22).fit(X_resampled,y_resampled)
+del X_resampled,y_resampled,X,y,X_test,y_train,y_test
 
+import pickle
+with open('model.pickle', 'wb') as f:
+    pickle.dump((model, scaler), f)
+
+
+
+
+"""
 from shap import TreeExplainer, Explanation
 from shap.plots import waterfall
 from streamlit_shap import st_shap
 
-explainer = shap.TreeExplainer(model)
-shap_values = explainer.shap_values(X_train)
+gpt 2
+@st.cache_data()
+def load_data():
+    # Load data here
+    global X, y
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    X_resampled, y_resampled = RandomUnderSampler(random_state=22).fit_resample(X_train,y_train)
 
-st_shap( shap.summary_plot(shap_values, features=X, feature_names=X.columns, max_display=10))
+    # Train model and compute Shapley values
+    model = RandomForestClassifier(max_depth=5, n_estimators=100,random_state=22).fit(X_resampled,y_resampled)
+    del X_resampled,y_resampled,X,y,X_test,y_train,y_test
+    
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer.shap_values(X_train)
+    sv = explainer(X_train.iloc[:,:])
+    exp = Explanation(sv.values[:,:,1], 
+                  sv.base_values[:,1], 
+                  data=X_train.values, 
+                  feature_names=X_train.columns)                                       
+    
+    return model, X_train, shap_values, exp
 
-sv = explainer(X_train.iloc[:,:])
-exp = Explanation(sv.values[:,:,1], 
+# Get cached data
+#model, X_train, shap_values, exp = load_data()
+
+# Use st.checkbox to display the plots only when the box is checked
+if st.sidebar.checkbox('affichage simple importance des critères', value=False):
+    # Get cached data
+    model, X_train, shap_values, exp = load_data()
+    st.write('Graphique explicatif ')
+    st_shap(shap.summary_plot(shap_values, features=X_train, feature_names=X_train.columns, max_display=10))
+
+if st.sidebar.checkbox('affichage complet importance des critères', value=False):  
+    model, X_train, shap_values, exp = load_data()
+    st.write('Graphique explicatif ')
+    st_shap(shap.plots.beeswarm(exp))
+
+# Ask for user input after displaying the plots to minimize memory usage
+noclient = st.number_input('Numero du client')
+st.write('Le client a analysé est :', noclient)
+
+
+
+gpt 1
+@st.cache(suppress_st_warning=True, allow_output_mutation=True)
+def get_shap_values(model, X_train):
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer.shap_values(X_train)
+    return shap_values
+
+@st.cache(suppress_st_warning=True, allow_output_mutation=True)
+def get_exp(shap_values, X_train):
+    exp = Explanation(shap_values.values[:,:,1], 
+                      shap_values.base_values[:,1], 
+                      data=X_train.values, 
+                      feature_names=X_train.columns)
+    return exp
+
+if st.sidebar.checkbox('affichage simple importance des critères'):
+    # Le code ci-dessous ne sera exécuté que si le bouton est coché
+    st.write('Graphique explicatif ')
+    shap_values = get_shap_values(model, X_train)
+    st_shap( shap.summary_plot(shap_values, features=X, feature_names=X.columns, max_display=10))
+
+if st.sidebar.checkbox('affichage complet importance des critères'):    
+    st.write('Graphique explicatif ')
+    shap_values = get_shap_values(model, X_train)
+    exp = get_exp(shap_values, X_train)
+    # afficher le beeswarm plot
+    st_shap (shap.plots.beeswarm(exp))
+
+#demande du no client et stockage dans number
+noclient = st.number_input('Numero du client')
+st.write('Le client a analysé est :', noclient)"""
+
+#HH
+if st.sidebar.checkbox('affichage simple importance des critères'):
+    # Le code ci-dessous ne sera exécuté que si le bouton est coché
+    st.write('Graphique explicatif ')
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer.shap_values(X_train)
+    st_shap( shap.summary_plot(shap_values, features=X_train, feature_names=X_train.columns, max_display=10))
+
+if st.sidebar.checkbox('affichage complet importance des critères'):    
+    st.write('Graphique explicatif ')
+    explainer = shap.TreeExplainer(model)
+    sv = explainer(X_train.iloc[:,:])
+    exp = Explanation(sv.values[:,:,1], 
                   sv.base_values[:,1], 
                   data=X_train.values, 
                   feature_names=X_train.columns)
-# afficher le beeswarm plot
-st_shap (shap.plots.beeswarm(exp))
+    # afficher le beeswarm plot
+    st_shap (shap.plots.beeswarm(exp))
+
+
+
 
 #demande du no client et stockage dans number
 noclient = st.number_input('Numero du client')
 st.write('Le client a analysé est :', noclient)
 
+#TODO mettre les 2 graphiques en ouverture par un bouton a gauche ce qui permet de ne pas retarder le reste de #'analyse
 
-"""
 
 # Creating a side bar radio option for selecting the required elements
 #
-_radio = st.sidebar.radio("menu",  ("Choix 1", "Choix 2"))
+#_radio = st.sidebar.radio("menu",  ("Choix 1", "Choix 2"))
 
 #demande du no client et stockage dans number
 #numero_client = st.text_input("Saisissez un no client, merci", value="0")
 
 #response_f= None 
 #num_client = None
-
+"""
 if st.button("Commencer"):
     # Saisie du numéro de client
     numero_client = st.text_input("Saisissez un numéro de client, merci")
