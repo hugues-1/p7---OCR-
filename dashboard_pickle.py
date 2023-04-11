@@ -157,17 +157,19 @@ if st.button('Recherche') :
 
 st.write( "no enregistrement",noclient) 
 
+if noclient!=0 : 
+
 # TODO PLANTE A LA PREMIERE INTERROGATION qd noclient = 0 ? ?  
-explainer = shap.TreeExplainer(model)
-sv = explainer(X_train.iloc[noclient:noclient+1,:])
-exp = Explanation(sv.values[:,:,1], 
+    explainer = shap.TreeExplainer(model)
+    sv = explainer(X_train.iloc[noclient:noclient+1,:])
+    exp = Explanation(sv.values[:,:,1], 
                   sv.base_values[:,1], 
                   data=X_train.values, 
                   feature_names=X_train.columns)
-idx = 0
-st.set_option('deprecation.showPyplotGlobalUse', False)
-fig = waterfall(exp[idx])
-st.pyplot(fig)
+    #idx = 0
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+    fig = waterfall(exp[0])
+    st.pyplot(fig)
 # TODO PLANTE A LA PREMIERE INTERROGATION ? 
 
 """
