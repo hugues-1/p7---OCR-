@@ -65,15 +65,13 @@ del X_resampled,y_resampled,X,y,X_test,y_train,y_test
 
 class User_input(BaseModel):
     nc : int
-    #nc : float
-    
+    #nc : float   
     
 app = FastAPI()
 
 @app.post("/noclient")
 def operate(input:User_input):
-    
-    
-    #result = ((input.nc * 137 + 187) % 1000)
-    result = model.predict(X_train.iloc[input.nc:input.nc+1,:])
+       
+    result = ((input.nc * 137 + 187) % 1000)
+    #result = model.predict(X_train.iloc[input.nc:input.nc+1,:])
     return result

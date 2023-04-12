@@ -150,13 +150,16 @@ inputs= {"nc":x}
 #on click fetch API
 if st.button('Recherche') :
     res = requests.post(url = "http://13.36.39.252:8080/noclient",data = json.dumps(inputs))
-    # st.subheader(f"réponse API = {res.text}")
-    st.subheader(f"réponse API = {int(res.text)}")
+    #st.write ( res.text)
+    #st.subheader(f"réponse API = {res.text}")
+    #st.subheader(f"réponse API = {int(res.text)}")
     noclient=int(res.text)
+    prob = model.predict_proba(X_train.iloc[noclient:noclient+1,:])*100
+    #st.write (prob[0,1]) 
+    st.subheader(f"réponse API probabilité de rejet du dossier = {prob[0,1]:.1f}%")
     
 
-st.write( "no enregistrement",noclient) 
-
+    
 if noclient!=0 : 
 
 # TODO PLANTE A LA PREMIERE INTERROGATION qd noclient = 0 ? ?  
@@ -178,12 +181,11 @@ sv = explainer(X_train.iloc[noclient:noclient+1,:])
 exp = Explanation(sv.values[:,:,1], 
                   sv.base_values[:,1], 
                   data=X_train.values, 
-                  feature_names=X_train.columns)"""
-"""
+                  feature_names=X_train.columns)
+
 fig, ax = plt.subplots()
 shap.waterfall_plot(sv.base_values, sv.values[0], feature_names=X_train.columns, max_display=10, show=False, ax=ax)
 st.pyplot(fig)
-
 """
 
 
