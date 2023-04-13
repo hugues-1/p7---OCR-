@@ -18,6 +18,7 @@ from sklearn.model_selection import train_test_split
 from shap import TreeExplainer
 
 
+
 base=pd.read_csv("/home/ec2-user/mygit/p7---OCR-/base_sample.csv")
 #base=pd.read_csv("~/mygit/p7---OCR-/base_sample.csv")
 base = base.drop( columns = ['Unnamed: 0'])
