@@ -60,7 +60,7 @@ del features
 del features_scale
 
 #resample 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,random_state=22)
 X_resampled, y_resampled = RandomUnderSampler(random_state=22).fit_resample(X_train,y_train)
 del X_resampled,y_resampled,X,y,X_test,y_train,y_test
 
@@ -72,7 +72,14 @@ app = FastAPI()
 
 @app.post("/noclient")
 def operate(input:User_input):
-       
-    result = ((input.nc * 137 + 187) % 1000)
-    #result = model.predict(X_train.iloc[input.nc:input.nc+1,:])
-    return result
+      
+    
+    resultpredict = model.predict(X_train.iloc[input.nc:input.nc+1,:])
+    result_int = int(resultpredict[0])
+    print ( result_int)
+    resultproba = model.predict_proba(X_train.iloc[input.nc:input.nc+1,:])
+    result_float = float(resultproba[0,1])
+    print (result_float)
+                    
+    
+    return {"result_int": result_int, "result_float": result_float}
