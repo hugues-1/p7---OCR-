@@ -10,11 +10,14 @@
 - Mettre en production le modèle de scoring et le dashboard avec des API
 
 ## Mise en oeuvre  : 
-- Utiliser un kernel externe pour l’analyse exploratoire et le feature engineering : lightGBM2.ipynb
-- Déterminer le meilleur modeles en testant plusieurs algorithmes, leurs hyperparametres, les méthodes de correction du déséquilibre de la base afin de mettre en oeuvre un modele de sélection des clients tenant compte des parametres métier: prediction_calc_nan.ipynb, result_score_metier_clean.ipynb & MLflow-surf.ipynb
-- Mettre en place le dashboard : dashboard_pickle.py
-- Mettre en place l'API : fast_api2.py
-- Anticiper sur le DataDrift en evidently.ipynb
+- Utiliser un kernel externe pour l’analyse exploratoire et le feature engineering : **lightGBM2.ipynb**
+- Déterminer le meilleur modeles en testant plusieurs algorithmes, leurs hyperparametres, les méthodes de correction du déséquilibre de la base afin de mettre en oeuvre un modele de sélection des clients tenant compte des parametres métier: 
+    - **prediction_calc_nan.ipynb**
+    - **result_score_metier_clean.ipynb** 
+    - **MLflow-surf.ipynb**
+- Mettre en place le dashboard : **dashboard_pickle.py**
+- Mettre en place l'API : **fast_api2.py**
+- Anticiper sur le DataDrift en **evidently.ipynb**
 
 ## Outils utilisés
 - environnement DataScience JupyterLab Scikit-learn, Pandas ..
