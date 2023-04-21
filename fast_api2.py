@@ -5,18 +5,9 @@ from pydantic import BaseModel
 import pandas as pd
 import sklearn
 from sklearn.ensemble import RandomForestClassifier
-import numpy as np
 from sklearn.preprocessing import StandardScaler
-import matplotlib.pyplot as plt
-import seaborn as sns
-import imblearn as imb
-
-from imblearn.under_sampling import RandomUnderSampler
-from imblearn.combine import SMOTETomek
 
 from sklearn.model_selection import train_test_split
-from shap import TreeExplainer
-
 
 
 base=pd.read_csv("/home/ec2-user/mygit/p7---OCR-/base_sample.csv")
