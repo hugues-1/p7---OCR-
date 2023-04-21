@@ -17,7 +17,7 @@
     - **MLflow-surf.ipynb**
 - Mettre en place le dashboard : **dashboard_pickle.py**
 - Mettre en place l'API : **fast_api2.py**
-- Anticiper sur le DataDrift en **evidently.ipynb**
+- Anticiper sur le DataDrift  **evidently.ipynb**
 
 ## Outils utilisés
 - environnement DataScience JupyterLab Scikit-learn, Pandas ..
