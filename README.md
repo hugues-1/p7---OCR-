@@ -24,7 +24,8 @@
 - MLflow recording et visualisation d'expérimentations
 - Streamlit pour le dashboard interactif 
 - FastApi pour le scoring client et le transmettre au dashboard
-- Evidently  pour mener l'anayse DataDrift et DataQuality
+- Screen pour assurer l'exécution des crtips dashboard et et api en arrière plan sur EC2
+- Evidently pour mener l'anayse DataDrift et DataQuality
 - GitHub pour la gestion des scripts et des modifications
 
 ## Plate-forme
