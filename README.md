@@ -28,7 +28,7 @@
 - Evidently pour mener l'anayse DataDrift et DataQuality
 - GitHub pour la gestion des scripts et des modifications
 
-## Plate-forme
+## Plate-forme :
 - en local pour les modéles de prédiction et les analyses 
 - sur AWS EC2 pour héberger le dashboard et l'api
 
